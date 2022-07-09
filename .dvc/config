@@ -1,0 +1,4 @@
+[core]
+    remote = census-s3
+['remote "census-s3"']
+    url = s3://cblythe-census
