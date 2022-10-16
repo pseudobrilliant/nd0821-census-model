@@ -1,0 +1,9 @@
+# Python version required to run the project.
+python: "3.10.7"
+# Dependencies required to build packages. This field is optional.
+build_dependencies:
+  - pip
+  - pytest
+# Dependencies required to run the project.
+dependencies:
+  - -r requirements.txt

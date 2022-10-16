@@ -1,5 +1,7 @@
 numpy
 pandas
+hydra-core
+mlflow
 scikit-learn
 pytest
 requests

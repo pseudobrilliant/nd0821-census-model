@@ -1,0 +1,12 @@
+name: census_training
+python_env: conf/python_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      hydra_options:
+        description: Hydra parameters to override
+        type: str
+        default: ''
+    command: >-
+      python ml/development.py $(echo {hydra_options})
