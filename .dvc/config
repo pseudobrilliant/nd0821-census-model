@@ -1,4 +1,5 @@
 [core]
     remote = census-s3
+    autostage = true
 ['remote "census-s3"']
     url = s3://cblythe-census
