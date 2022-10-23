@@ -12,6 +12,7 @@ from train_model import train_random_forest, inference, compute_model_metrics
 from omegaconf import DictConfig, OmegaConf
 from sklearn.model_selection import train_test_split
 
+SUPPORTED_ALGORITHMS = {"random_forest": train_random_forest}
 
 def get_experiment(client: MlflowClient, experiment_name: str):
 
@@ -50,9 +51,12 @@ def main(config: DictConfig):
     data_config = config['data']
     train, test = train_test_split(data, **data_config)
 
+    categorical_features = config['labels']['categorical']
+    target_feature = config['labels']['target']
+
     logging.info("Processing Data")
     X_train, y_train, encoder, lb = process_data(
-    train, categorical_features=config['categorical'], label=config['label'], training=True)
+    train, categorical_features=categorical_features, label=target_feature, training=True)
 
     joblib.dump(encoder,"encoder.pkl")
     mlflow.log_artifact("encoder.pkl")
@@ -61,18 +65,25 @@ def main(config: DictConfig):
     mlflow.log_artifact("lb.pkl")
 
     X_test, y_test, _, _ = process_data(
-        test,categorical_features=config['categorical'], label=config['label'], training=False,
+        test, categorical_features=categorical_features, label=target_feature, training=False,
         encoder=encoder, lb=lb
     )
 
-    logging.info("Training Model")
-    mlflow.log_params(config['random_forest'])
-    model = train_random_forest(X_train, y_train, config['random_forest'])
+    model_name = config['model']['model_name']
+    model_params = config['model']['model_parameters']
 
+    if model_name in SUPPORTED_ALGORITHMS:
+        logging.info(f"Training Model {model_name}")
+        mlflow.log_params(model_params)
 
-    joblib.dump(model,"random_forest_model.pkl")
-    mlflow.log_artifact("random_forest_model.pkl")
-    mlflow.sklearn.log_model(model,"random_forest_model")
+        model = SUPPORTED_ALGORITHMS[model_name](X_train, y_train, model_params)
+    else:
+        raise ValueError("Model type requested not currently available")
+
+    model_file_name = f"{model_name}_model.pkl"
+    joblib.dump(model, model_file_name)
+    mlflow.log_artifact(model_file_name)
+    mlflow.sklearn.log_model(model,f"{model_name}_model")
 
     logging.info("Evaluating Model")
     y_hat = inference(model, X_test)
