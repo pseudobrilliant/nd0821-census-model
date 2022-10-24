@@ -57,6 +57,8 @@ The following fields will be treated as categorical values to be one-hot-encoded
 The production model saved will generate a prediction as to whether the census item provided represents an individual with a salary of <=50K or >50K a year.
 
 ## Training Data
+Census Dataset: https://archive.ics.uci.edu/ml/datasets/census+income.
+
 All models were trained on 22793 values of the training split (70%) from the 32561 items in the census dataset provided (`./data/raw`). The data was manually edited to address some white space, and naming convention issues (`./data/cleaned`)
 
 ## Evaluation Data
@@ -77,4 +79,5 @@ The data provided has been throughly cleaned of any identifying markers and is p
 Therefore we are aware of no ethical concerns or unintended ethical implications at this time.
 
 ## Caveats and Recommendations
-Other classification based models should be attempted for comparison. Additional parameter sweeps could also result in better performing models.
+Other classification based models should be attempted for comparison.
+Additional parameter sweeps could also result in better performing models.
