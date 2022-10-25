@@ -1,14 +1,19 @@
 """Utility Module"""
+
+import logging
+import os
+
 import joblib
 import yaml
-
-from dvc.repo import Repo
 
 
 def production_update_dvc():
     """Utility function used to load / reload DVC stored data"""
-    repo = Repo()
-    repo.pull()
+    logging.info("Loading / Reloading DVC Stored Data")
+    os.system("dvc config core.no_scm true")
+    if os.system("dvc pull -f") != 0:
+        exit("dvc pull failed")
+    os.system("rm -r .dvc .apt/usr/lib/dvc")
 
 
 def get_labels():

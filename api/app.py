@@ -1,6 +1,7 @@
 """Inference API"""
 
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -22,9 +23,11 @@ WELCOME_MESSAGE = "Welcome to the census inference application. \
 
 
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
     """ "Startup function to bootstrap required app variables"""
-    production_update_dvc()
+
+    if "DYNO" in os.environ and os.path.isdir(".dvc"):
+        production_update_dvc()
 
     cat, target = get_labels()
     APP_VARIABLES["categorical_features"] = cat
@@ -39,7 +42,7 @@ def startup_event():
 
 
 @app.on_event("shutdown")
-def shutdown_event():
+async def shutdown_event():
     """Shutdown function that logs a shutdown event"""
     logging.info("Application Shutdown")
 
