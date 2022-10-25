@@ -1,7 +1,6 @@
 """Inference API"""
 
 import logging
-import os
 
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
