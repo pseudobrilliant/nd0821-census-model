@@ -1,7 +1,8 @@
-from urllib import response
+"""API Tests"""
+from http import HTTPStatus
+
 from api.app import WELCOME_MESSAGE
 from api.model import CensusData
-from http import HTTPStatus
 
 LESS_THAN_EQUAL_50_SAMPLE = CensusData(
                                 age=46,

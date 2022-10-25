@@ -1,3 +1,4 @@
+"""ML Tests"""
 from ml.process import process_data
 from ml.train_model import inference, compute_model_metrics
 
@@ -14,7 +15,8 @@ def test_processing(testing_data, input_labels, production_model):
             lb=lb)
 
     assert x.shape == (len(testing_data), NUM_EXPECTED_FEATURES)
-    unique_features = len(set(testing_data.columns) - set(cat) - set(target)) + sum(encoder._n_features_outs)
+    unique_features = len(set(testing_data.columns) - set(cat) - set(target))
+    unique_features += sum(encoder._n_features_outs) # pylint: disable=protected-access
     assert unique_features == x.shape[1]
 
 def test_saved_inference(testing_data, production_model, input_labels):

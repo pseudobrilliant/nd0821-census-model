@@ -1,3 +1,5 @@
+"""Model Development"""
+
 import logging
 import os
 import hydra
@@ -7,15 +9,16 @@ import pandas as pd
 
 from dvc.repo import Repo
 from mlflow.tracking import MlflowClient
-from process import process_data
-from train_model import train_random_forest, inference, compute_model_metrics
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
+
+from ml.process import process_data
+from ml.train_model import train_random_forest, inference, compute_model_metrics
 
 SUPPORTED_ALGORITHMS = {"random_forest": train_random_forest}
 
 def get_experiment(client: MlflowClient, experiment_name: str):
-
+    """Returns an eperiment object and id by name, creating one if it does not already exist"""
     experiment = client.get_experiment_by_name(experiment_name)
     if experiment is None:
         experiment_id = client.create_experiment(experiment_name)
@@ -28,7 +31,7 @@ def get_experiment(client: MlflowClient, experiment_name: str):
 
 @hydra.main(config_name='training_config', config_path='../conf')
 def main(config: DictConfig):
-
+    """Primary function for running training experiment pipeline from data retrieval to training"""
     client = MlflowClient()
     _, experiment_id = get_experiment(client, config['experiment_name'])
     mlflow.start_run(experiment_id=experiment_id)
@@ -55,7 +58,7 @@ def main(config: DictConfig):
     target_feature = config['labels']['target']
 
     logging.info("Processing Data")
-    X_train, y_train, encoder, lb = process_data(
+    x_train, y_train, encoder, lb = process_data(
     train, categorical_features=categorical_features, label=target_feature, training=True)
 
     joblib.dump(encoder,"encoder.pkl")
@@ -64,7 +67,7 @@ def main(config: DictConfig):
     joblib.dump(lb,"lb.pkl")
     mlflow.log_artifact("lb.pkl")
 
-    X_test, y_test, _, _ = process_data(
+    x_test, y_test, _, _ = process_data(
         test, categorical_features=categorical_features, label=target_feature, training=False,
         encoder=encoder, lb=lb
     )
@@ -73,10 +76,10 @@ def main(config: DictConfig):
     model_params = config['model']['model_parameters']
 
     if model_name in SUPPORTED_ALGORITHMS:
-        logging.info(f"Training Model {model_name}")
+        logging.info("Training Model %s", model_name)
         mlflow.log_params(model_params)
 
-        model = SUPPORTED_ALGORITHMS[model_name](X_train, y_train, model_params)
+        model = SUPPORTED_ALGORITHMS[model_name](x_train, y_train, model_params)
     else:
         raise ValueError("Model type requested not currently available")
 
@@ -86,7 +89,7 @@ def main(config: DictConfig):
     mlflow.sklearn.log_model(model,f"{model_name}_model")
 
     logging.info("Evaluating Model")
-    y_hat = inference(model, X_test)
+    y_hat = inference(model, x_test)
     precision, recall, fbeta = compute_model_metrics(y_test, y_hat)
 
     mlflow.log_metric("precision", precision)
@@ -101,4 +104,4 @@ def main(config: DictConfig):
     mlflow.end_run()
 
 if __name__ == "__main__":
-    main()
+    main() # pylint: disable=no-value-for-parameter

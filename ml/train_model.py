@@ -1,8 +1,9 @@
+"""Model Training"""
 
-from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import fbeta_score, precision_score, recall_score
 
-def train_random_forest(X_train, y_train, random_forest_args):
+def train_random_forest(x_train, y_train, random_forest_args):
     """
     Trains a machine learning model and returns it.
     Inputs
@@ -19,7 +20,7 @@ def train_random_forest(X_train, y_train, random_forest_args):
 
     random_forest = RandomForestClassifier(**random_forest_args)
 
-    random_forest.fit(X_train, y_train)
+    random_forest.fit(x_train, y_train)
 
     return random_forest
 
@@ -45,13 +46,13 @@ def compute_model_metrics(y, preds):
     return precision, recall, fbeta
 
 
-def inference(model, X):
+def inference(model, x):
     """ Run model inferences and return the predictions.
     Inputs
     ------
     model : RandomForestClassifier
         Trained machine learning model.
-    X : np.array
+    x : np.array
         Data used for prediction.
     Returns
     -------
@@ -59,4 +60,4 @@ def inference(model, X):
         Predictions from the model.
     """
 
-    return model.predict(X)
+    return model.predict(x)
