@@ -23,8 +23,10 @@ WELCOME_MESSAGE = "Welcome to the census inference application. \
 
 
 @app.on_event("startup")
-async def startup_event():
+def startup_event():
     """ "Startup function to bootstrap required app variables"""
+    production_update_dvc()
+
     cat, target = get_labels()
     APP_VARIABLES["categorical_features"] = cat
     APP_VARIABLES["target"] = target
@@ -34,13 +36,11 @@ async def startup_event():
     APP_VARIABLES["encoder"] = encoder
     APP_VARIABLES["lb"] = lb
 
-    production_update_dvc()
-
     logging.info("Application Loaded")
 
 
 @app.on_event("shutdown")
-async def shutdown_event():
+def shutdown_event():
     """Shutdown function that logs a shutdown event"""
     logging.info("Application Shutdown")
 
