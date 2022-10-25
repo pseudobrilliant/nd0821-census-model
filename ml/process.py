@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
 def process_data(
     x, categorical_features=None, label=None, training=True, encoder=None, lb=None
 ):
-    """ Process the data used in the machine learning pipeline.
+    """Process the data used in the machine learning pipeline.
     Processes the data using one hot encoding for the categorical features and a
     label binarizer for the labels. This can be used in either training or
     inference/validation.

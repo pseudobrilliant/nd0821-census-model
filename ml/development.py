@@ -17,6 +17,7 @@ from ml.train_model import train_random_forest, inference, compute_model_metrics
 
 SUPPORTED_ALGORITHMS = {"random_forest": train_random_forest}
 
+
 def get_experiment(client: MlflowClient, experiment_name: str):
     """Returns an eperiment object and id by name, creating one if it does not already exist"""
     experiment = client.get_experiment_by_name(experiment_name)
@@ -29,11 +30,11 @@ def get_experiment(client: MlflowClient, experiment_name: str):
     return experiment, experiment_id
 
 
-@hydra.main(config_name='training_config', config_path='../conf')
+@hydra.main(config_name="training_config", config_path="../conf")
 def main(config: DictConfig):
     """Primary function for running training experiment pipeline from data retrieval to training"""
     client = MlflowClient()
-    _, experiment_id = get_experiment(client, config['experiment_name'])
+    _, experiment_id = get_experiment(client, config["experiment_name"])
     mlflow.start_run(experiment_id=experiment_id)
 
     logging.info("Run Started")
@@ -41,39 +42,49 @@ def main(config: DictConfig):
 
     root_path = hydra.utils.get_original_cwd()
 
-    mlflow.log_artifact(os.path.join(root_path,'conf','training_config.yaml'), 'config.yaml')
+    mlflow.log_artifact(
+        os.path.join(root_path, "conf", "training_config.yaml"), "config.yaml"
+    )
 
-    logging.info('Retrieving Data')
+    logging.info("Retrieving Data")
     repo = Repo(root_dir=root_path)
     repo.pull()
 
-    train_data_path = os.path.join(root_path,'data','cleaned','census_clean.csv')
-    mlflow.log_artifact(train_data_path,"census_clean.csv")
+    train_data_path = os.path.join(root_path, "data", "cleaned", "census_clean.csv")
+    mlflow.log_artifact(train_data_path, "census_clean.csv")
     data = pd.read_csv(train_data_path)
 
-    data_config = config['data']
+    data_config = config["data"]
     train, test = train_test_split(data, **data_config)
 
-    categorical_features = config['labels']['categorical']
-    target_feature = config['labels']['target']
+    categorical_features = config["labels"]["categorical"]
+    target_feature = config["labels"]["target"]
 
     logging.info("Processing Data")
     x_train, y_train, encoder, lb = process_data(
-    train, categorical_features=categorical_features, label=target_feature, training=True)
+        train,
+        categorical_features=categorical_features,
+        label=target_feature,
+        training=True,
+    )
 
-    joblib.dump(encoder,"encoder.pkl")
+    joblib.dump(encoder, "encoder.pkl")
     mlflow.log_artifact("encoder.pkl")
 
-    joblib.dump(lb,"lb.pkl")
+    joblib.dump(lb, "lb.pkl")
     mlflow.log_artifact("lb.pkl")
 
     x_test, y_test, _, _ = process_data(
-        test, categorical_features=categorical_features, label=target_feature, training=False,
-        encoder=encoder, lb=lb
+        test,
+        categorical_features=categorical_features,
+        label=target_feature,
+        training=False,
+        encoder=encoder,
+        lb=lb,
     )
 
-    model_name = config['model']['model_name']
-    model_params = config['model']['model_parameters']
+    model_name = config["model"]["model_name"]
+    model_params = config["model"]["model_parameters"]
 
     if model_name in SUPPORTED_ALGORITHMS:
         logging.info("Training Model %s", model_name)
@@ -86,7 +97,7 @@ def main(config: DictConfig):
     model_file_name = f"{model_name}_model.pkl"
     joblib.dump(model, model_file_name)
     mlflow.log_artifact(model_file_name)
-    mlflow.sklearn.log_model(model,f"{model_name}_model")
+    mlflow.sklearn.log_model(model, f"{model_name}_model")
 
     logging.info("Evaluating Model")
     y_hat = inference(model, x_test)
@@ -103,5 +114,6 @@ def main(config: DictConfig):
 
     mlflow.end_run()
 
+
 if __name__ == "__main__":
-    main() # pylint: disable=no-value-for-parameter
+    main()  # pylint: disable=no-value-for-parameter

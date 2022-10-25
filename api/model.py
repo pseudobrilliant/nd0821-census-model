@@ -1,8 +1,10 @@
 """API Model"""
 from pydantic import BaseModel
 
+
 class CensusData(BaseModel):
     """Pydantic class representing a census data item to be inferenced upon"""
+
     age: int
     workclass: str
     fnlgt: int
@@ -20,6 +22,7 @@ class CensusData(BaseModel):
 
     class Config:
         """Configuration class for pydantic data model"""
+
         schema_extra = {
             "example": {
                 "age": 27,
@@ -34,6 +37,6 @@ class CensusData(BaseModel):
                 "relationship": "Husband",
                 "race": "White",
                 "sex": "Male",
-                "hours_per_week": 40
+                "hours_per_week": 40,
             }
         }
