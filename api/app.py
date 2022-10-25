@@ -34,8 +34,7 @@ async def startup_event():
     APP_VARIABLES["encoder"] = encoder
     APP_VARIABLES["lb"] = lb
 
-    if "DYNO" in os.environ and os.path.isdir(".dvc"):
-        production_update_dvc()
+    production_update_dvc()
 
     logging.info("Application Loaded")
 
