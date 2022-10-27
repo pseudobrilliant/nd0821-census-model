@@ -73,6 +73,7 @@ The final production model was selected according to it's high beta score and ba
   - fbeta: 0.688
   - precision: 0.6663
   - recall: 0.711
+Metrics at a slice level per unique item in each categorical feature have been provided in `slice/slice_performance.csv`
 
 ## Ethical Considerations
 The data provided has been throughly cleaned of any identifying markers and is publicly accessible to all.
