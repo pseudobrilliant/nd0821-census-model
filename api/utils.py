@@ -10,6 +10,7 @@ import yaml
 def production_update_dvc():
     """Utility function used to load / reload DVC stored data"""
     logging.info("Loading / Reloading DVC Stored Data")
+    os.system("touch lock")
     os.system("dvc config core.no_scm true")
     if os.system("dvc pull -f") != 0:
         exit("dvc pull failed")

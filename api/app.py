@@ -15,6 +15,16 @@ from api.utils import production_update_dvc, get_labels, get_production_model
 from ml.process import process_data
 from ml.train_model import inference
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
+
 app = FastAPI()
 
 APP_VARIABLES = {}
@@ -26,7 +36,7 @@ WELCOME_MESSAGE = "Welcome to the census inference application. \
 async def startup_event():
     """ "Startup function to bootstrap required app variables"""
 
-    if "DYNO" in os.environ and os.path.isdir(".dvc"):
+    if "DYNO" in os.environ and os.path.isdir(".dvc") and not os.path.exists("lock"):
         production_update_dvc()
 
     cat, target = get_labels()
@@ -56,6 +66,7 @@ def root():
 @app.post("/infer")
 def predict(data: CensusData):
     """Predicts appropriate salary labels based on census data provided"""
+    logging.info("Message received")
     df = pd.DataFrame.from_dict([jsonable_encoder(data)])
 
     x_input, _, _, _ = process_data(
