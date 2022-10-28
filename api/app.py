@@ -14,7 +14,6 @@ from api.utils import production_update_dvc, get_labels, get_production_model
 
 from ml.process import process_data
 from ml.train_model import inference
-from time import sleep
 
 
 logging.basicConfig(
@@ -37,12 +36,8 @@ WELCOME_MESSAGE = "Welcome to the census inference application. \
 async def startup_event():
     """ "Startup function to bootstrap required app variables"""
 
-    if "DYNO" in os.environ:
-        if os.path.isdir(".dvc") and not os.path.exists("lock"):
-            production_update_dvc()
-        else:
-            while os.path.exists("lock") and not os.path.exists("ready"):
-                sleep(1)
+    if "DYNO" in os.environ and os.path.isdir(".dvc"):
+        production_update_dvc()
 
     cat, target = get_labels()
     APP_VARIABLES["categorical_features"] = cat
