@@ -12,15 +12,17 @@ import yaml
 def production_update_dvc():
     """Utility function used to load / reload DVC stored data"""
     logging.info("Loading / Reloading DVC Stored Data")
-    while os.path.exists("lock") and not os.path.exists("ready"):
-        sleep(1)
 
-    os.system("touch lock")
     os.system("dvc config core.no_scm true")
     if os.system("dvc pull -f") != 0:
-        exit("dvc pull failed")
-    os.system("rm -r .dvc .apt/usr/lib/dvc")
-    os.system("touch ready")
+        logging.info('DVC likely in use, process Waiting')
+        while not os.path.exists("ready"):
+            sleep(2)
+        logging.info('DVC ready, process continuing')
+    else:
+        os.system("rm -r .dvc .apt/usr/lib/dvc")
+        os.system("touch ready")
+        logging.info("DVC pull completed")
 
 
 def get_labels():
