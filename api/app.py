@@ -75,10 +75,6 @@ def predict(data: CensusData):
         lb=lb,
     )
 
-    # Deleting used values to lower memory usage
-    del df
-    del encoder
-
     model = get_production_model()
     y_hat = inference(model, x_input)
     label = lb.inverse_transform(y_hat)[0]
