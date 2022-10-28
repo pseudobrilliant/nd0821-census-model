@@ -33,7 +33,7 @@ def slice_performance(data_path="./data/cleaned/census_clean.csv"):
             print(f"{cat} | {unique_item} - precision: {precision}, recall: {recall}, fbeta: {f_beta}\n")
             results.append([cat, unique_item, precision, recall, f_beta])
 
-    with open("./slice/slice_performance.csv", 'w', encoding="utf8") as fh:
+    with open("slice_output.csv", 'w', encoding="utf8") as fh:
         csv_writer = csv.writer(fh)
         csv_writer.writerow(["category", "slice", "precision", "recall", "fbeta"])
         csv_writer.writerows(results)
