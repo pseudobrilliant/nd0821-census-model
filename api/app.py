@@ -43,11 +43,6 @@ async def startup_event():
     APP_VARIABLES["categorical_features"] = cat
     APP_VARIABLES["target"] = target
 
-    model, encoder, lb = get_production_model()
-    APP_VARIABLES["model"] = model
-    APP_VARIABLES["encoder"] = encoder
-    APP_VARIABLES["lb"] = lb
-
     logging.info("Application Loaded")
 
 
@@ -67,8 +62,8 @@ def root():
 def predict(data: CensusData):
     """Predicts appropriate salary labels based on census data provided"""
     logging.info("Inference request received")
-    if 'model' not in APP_VARIABLES or APP_VARIABLES['model'] is None:
-        logging.warning("Unable to infer during startup sequence.")
+
+    model, encoder, lb = get_production_model()
 
     df = pd.DataFrame.from_dict([jsonable_encoder(data)])
 
@@ -76,12 +71,16 @@ def predict(data: CensusData):
         df,
         categorical_features=APP_VARIABLES["categorical_features"],
         training=False,
-        encoder=APP_VARIABLES["encoder"],
-        lb=APP_VARIABLES["lb"],
+        encoder=encoder,
+        lb=lb,
     )
 
-    y_hat = inference(APP_VARIABLES["model"], x_input)
-    label = APP_VARIABLES["lb"].inverse_transform(y_hat)[0]
+    # Deleting used values to lower memory usage
+    del df
+    del encoder
+
+    y_hat = inference(model, x_input)
+    label = lb.inverse_transform(y_hat)[0]
 
     return label
 

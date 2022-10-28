@@ -49,7 +49,7 @@ jobs:
         run: |
           dvc pull
           
-      - name: Flake8 
+      - name: Flake8
         uses: suo/flake8-github-action@v1
         with:
           checkName: pipeline
