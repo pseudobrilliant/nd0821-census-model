@@ -38,5 +38,6 @@ class CensusData(BaseModel):
                 "race": "White",
                 "sex": "Male",
                 "hours_per_week": 40,
+                "workclass": "Private"
             }
         }
