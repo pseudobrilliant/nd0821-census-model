@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import csv
 import pandas as pd
 
-from api.utils import get_labels, get_production_model
+from api.utils import get_labels, get_production_model, get_production_encoder
 from ml.process import process_data
 from ml.train_model import inference, compute_model_metrics
 
@@ -11,7 +11,8 @@ from ml.train_model import inference, compute_model_metrics
 def slice_performance(data_path="./data/cleaned/census_clean.csv"):
     """Performs a performance test on each categorical slice"""
     categorical, target = get_labels()
-    model, encoder, lb = get_production_model()
+    encoder, lb = get_production_encoder()
+    model = get_production_model()
 
     df = pd.read_csv(data_path)
     _, test = train_test_split(df)

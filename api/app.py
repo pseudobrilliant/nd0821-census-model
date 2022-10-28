@@ -10,7 +10,7 @@ import pandas as pd
 import uvicorn
 
 from api.model import CensusData
-from api.utils import production_update_dvc, get_labels, get_production_model
+from api.utils import production_update_dvc, get_labels, get_production_model, get_production_encoder
 
 from ml.process import process_data
 from ml.train_model import inference
@@ -63,7 +63,7 @@ def predict(data: CensusData):
     """Predicts appropriate salary labels based on census data provided"""
     logging.info("Inference request received")
 
-    model, encoder, lb = get_production_model()
+    encoder, lb = get_production_encoder()
 
     df = pd.DataFrame.from_dict([jsonable_encoder(data)])
 
@@ -79,6 +79,7 @@ def predict(data: CensusData):
     del df
     del encoder
 
+    model = get_production_model()
     y_hat = inference(model, x_input)
     label = lb.inverse_transform(y_hat)[0]
 

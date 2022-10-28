@@ -32,15 +32,23 @@ def get_labels():
         return data_loaded["categorical"], data_loaded["target"]
 
 
-def get_production_model(
-    model_path="model/random_forest_model.pkl",
+def get_production_encoder(
     encoder_path="model/encoder.pkl",
-    lb_path="model/lb.pkl",
+    lb_path="model/lb.pkl"
+):
+    """Utility function used to get the production model"""
+
+    encoder = joblib.load(encoder_path)
+    lb = joblib.load(lb_path)
+
+    return encoder, lb
+
+
+def get_production_model(
+    model_path="model/random_forest_model.pkl"
 ):
     """Utility function used to get the production model"""
 
     model = joblib.load(model_path)
-    encoder = joblib.load(encoder_path)
-    lb = joblib.load(lb_path)
 
-    return model, encoder, lb
+    return model

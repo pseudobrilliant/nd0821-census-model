@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sklearn.model_selection import train_test_split
 
 from api.app import app
-from api.utils import get_labels, get_production_model
+from api.utils import get_labels, get_production_encoder, get_production_model
 
 
 TEST_DATA_PATH = "./data/cleaned/census_clean.csv"
@@ -38,8 +38,14 @@ def testing_data():
 
 @pytest.fixture(scope="session")
 def production_model():
-    """Test fixture that reutrns a production model and all it's dependencies"""
+    """Test fixture that reutrns a production model"""
     return get_production_model()
+
+
+@pytest.fixture(scope="session")
+def production_encoder():
+    """Test fixture that reutrns a production encoder and all it's dependencies"""
+    return get_production_encoder()
 
 
 @pytest.fixture(scope="session")

@@ -5,9 +5,9 @@ from ml.train_model import inference, compute_model_metrics
 NUM_EXPECTED_FEATURES = 108
 
 
-def test_processing(testing_data, input_labels, production_model):
+def test_processing(testing_data, input_labels, production_encoder):
     """Tests the processed data is structured as expected"""
-    _, encoder, lb = production_model
+    encoder, lb = production_encoder
     cat, target = input_labels
 
     x, _, _, _ = process_data(
@@ -25,9 +25,10 @@ def test_processing(testing_data, input_labels, production_model):
     assert unique_features == x.shape[1]
 
 
-def test_saved_inference(testing_data, production_model, input_labels):
+def test_saved_inference(testing_data, production_model, production_encoder, input_labels):
     """Test the model to ensure it is generating the appropriate inference value and structure"""
-    model, encoder, lb = production_model
+    model = production_model
+    encoder, lb = production_encoder
     cat, target = input_labels
 
     x, _, _, _ = process_data(
@@ -46,9 +47,10 @@ def test_saved_inference(testing_data, production_model, input_labels):
     assert set(labels) == set(lb.classes_)
 
 
-def test_metrics(testing_data, input_labels, production_model):
+def test_metrics(testing_data, input_labels, production_model, production_encoder):
     """Test metric computation to ensure the right values are being returned"""
-    model, encoder, lb = production_model
+    model = production_model
+    encoder, lb = production_encoder
     cat, target = input_labels
 
     x, y, _, _ = process_data(
