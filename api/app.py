@@ -71,6 +71,7 @@ def root():
 @app.post("/infer")
 def predict(data: CensusData):
     """Predicts appropriate salary labels based on census data provided"""
+    logging.info("Inference request received")
     if 'model' not in APP_VARIABLES or APP_VARIABLES['model'] is None:
         logging.warning("Unable to infer during startup sequence.")
 
